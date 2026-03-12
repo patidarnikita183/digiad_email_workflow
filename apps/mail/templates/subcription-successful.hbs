@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscription Confirmed - {{appName}}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: rgb(0, 0, 0);
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .content {
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .greeting {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .main-text {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .details-paragraph {
+      background-color: #f8f9fa;
+      border-left: 4px solid  #764ba2;
+      padding: 20px;
+      margin: 25px 0;
+      border-radius: 6px;
+      font-size: 16px;
+      line-height: 1.8;
+      color:black;
+    }
+
+    .confirmation-text {
+      font-size: 16px;
+      margin: 25px 0;
+      color: #555;
+    }
+
+    .support-text {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .footer {
+
+      background-color: #f8f9fa;
+
+      text-align: center;
+
+      padding: 30px 20px;
+
+      border-top: 1px solid #e9ecef;
+
+    }
+
+    .footer-text {
+
+      font-size: 16px;
+
+      margin-bottom: 15px;
+
+      color: #333;
+
+    }
+
+    .footer-link {
+
+      color:  #764ba2;
+
+      text-decoration: none;
+
+      font-size: 14px;
+
+    }
+
+    .footer-link:hover {
+
+      text-decoration: underline;
+
+    }
+
+    .support-email {
+
+      color:  #764ba2;
+
+      text-decoration: none;
+
+      font-size: 14px;
+
+      margin-top: 10px;
+
+      display: inline-block;
+
+    }
+
+    .copyright {
+
+      margin-top: 20px;
+
+      font-size: 12px;
+
+      color: #999;
+
+    }
+  
+    p{
+      color:black;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container" style="border:1px solid black;">
+    <div class="header" style="background-color: #764ba2 ">
+      <h1 style="color:#ffffff">Subscription Confirmed</h1>
+    </div>
+    <div class="content">
+      <div class="greeting">Hello {{userName}},</div>
+      <div class="main-text">
+
+        We received your subscription request and it has been successfully processed. Your subscription details are as
+        follows:
+      </div>
+      <div class="details-paragraph">
+
+        Your <strong>{{planName}}</strong> subscription for <strong>{{amount}}</strong> has been activated. Your next
+        billing date is <strong>{{billingDate}}</strong> and your payment ID is <strong>{{paymentId}}</strong> for your
+        records.
+      </div>
+      <div class="confirmation-text">
+
+        You now have access to all the premium features included in your plan. We appreciate your support!
+      </div>
+      <div class="support-text">
+
+        For further assistance, feel free to contact our support team.
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-text">
+        Thank you,<br>
+        The {{appName}} Team
+      </div>
+      <a href="mailto:{{supportEmail}}" class="footer-link" style="color: #6366f1; text-decoration: none;">Contact Support</a>
+    </div>
+  </div>
+</body>
+
+</html>

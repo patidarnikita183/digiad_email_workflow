@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Contact Confirmation</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    margin: 0;
+    padding: 20px;
+    color: #000000;
+    min-height: 100vh;
+  }
+
+  .email-container {
+    max-width: 600px;
+    margin: auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 30px;
+  }
+
+  .header {
+    text-align: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    margin: -30px -30px 30px -30px;
+    padding: 25px 30px;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .header h2 {
+    color: #000000;
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  .content {
+    line-height: 1.8;
+    text-align: center;
+    color: #000000;
+  }
+
+  .content p {
+    margin: 0 0 16px 0;
+    color: #000000;
+  }
+
+  .footer {
+    border-top: 1px solid #e0e0e0;
+    margin-top: 30px;
+    padding-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #000000;
+  }
+
+  .footer p {
+    color: #000000;
+  }
+
+  .footer a {
+    color: #4285f4;
+    text-decoration: none;
+  }
+  p{
+    color:black;
+  }
+  h2{
+    color:white;
+  }
+</style>
+</head>
+<body>
+<div class="email-container" style="border:1px solid #e0e0e0;">
+  <div class="header" style="background: #764ba2; text-align: center;">
+    <h2 style="color:white">Thanks for Contacting Us - digiAd AI</h2>
+  </div>
+  <div class="content">
+    <p>Hi {{name}},</p>
+    <p>Thank you for reaching out to digiAd.</p>
+    <p>We have received your message and will get back to you shortly.</p>
+    <p>If you have any additional questions, feel free to reply to this email.</p>
+  </div>
+  <div class="footer">
+    <p>Thanks,<br/>digiAd AI Team</p>
+     <p><a href="{{supportMail}}" style="color: #6366f1 !important; text-decoration: none;">{{supportMail}}</a></p>
+  </div>
+</div>
+</body>
+</html>

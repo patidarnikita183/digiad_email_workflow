@@ -7,9 +7,9 @@ from flask import Flask, jsonify, render_template_string, request
 from mail.config import Config
 from mail.email_service import DomainEmailService
 from mail.mail_helpers import render_hbs_template
-from utils.email_template import html_content
+from utils.email_template import html_content,paused_campaign_mail_html_template
 from utils.general_constants import BASE_URL_EMAIL, LOGO_PATH, log_errors_and_respond,logger
-from utils.general_helper import prepare_data_for_mail, get_platform_campaign_performance_metrics, get_platform_campaign_audience_metrics, validate_path,remove_files_if_exists
+from utils.general_helper import (prepare_data_for_mail, get_platform_campaign_performance_metrics, get_platform_campaign_audience_metrics, validate_path,remove_files_if_exists, check_any_platform_active,prepare_data_for_paused_campaign)
 from utils.google_analytics import *
 from utils.meta_analytics import *
 from utils.snapchat_analytics import *
@@ -119,6 +119,7 @@ def send_email():
 @log_errors_and_respond(status_code=500)
 def get_campaign_report():
     data = request.get_json()
+    print("data",data)
     logger.info(f"Request received for hourly campaign- performance, Request data: {data}")
     customer_name = data.get("customer_name")
     campaign_name = data.get("campaign_name")
@@ -134,23 +135,43 @@ def get_campaign_report():
     youtube_credentials = platforms.get("youtube", {})
     instagram_credentials = platforms.get("instagram", {})
 
-    platforms_data,valid_platforms = get_platform_campaign_performance_metrics(google_credentials,facebook_credentials,snapchat_credentials,twitter_credentials,tiktok_credentials,youtube_credentials,instagram_credentials)
+    all_platform_credentials = [
+        google_credentials,
+        facebook_credentials,
+        snapchat_credentials,
+        twitter_credentials,
+        tiktok_credentials,
+        youtube_credentials,
+        instagram_credentials
+    ]
+
+    is_any_active = check_any_platform_active(all_platform_credentials)
     
-    logger.info(f"campaign performace data fetched. valid platforms : {valid_platforms}")
-    # Current UTC time
     utc_now = datetime.datetime.now(timezone.utc)      # Format like "21-Aug-2025 09:00 AM UTC"
     current_date = utc_now.strftime("%d-%b-%Y %I:%M %p UTC")
-    
-    data = prepare_data_for_mail(
-        customer_name, campaign_name, current_date, platforms_data
-    )
 
-    logger.info(f"data prepared for mail")
+    if is_any_active:        
+        platforms_data,valid_platforms = get_platform_campaign_performance_metrics(google_credentials,facebook_credentials,snapchat_credentials,twitter_credentials,tiktok_credentials,youtube_credentials,instagram_credentials)
+        
+        logger.info(f"campaign performace data fetched. valid platforms : {valid_platforms}")
+        # Current UTC time
+        prepared_data = prepare_data_for_mail(
+            customer_name, campaign_name, current_date, platforms_data,platforms_config=platforms
+        )
 
-    html_template = render_template_string(
-        html_content, valid_platforms=valid_platforms, **data
-    )
-    logger.info(f"Data rendered to html template and sending mail to {to_mail}")
+        logger.info(f"data prepared for mail")
+
+        html_template = render_template_string(
+            html_content, valid_platforms=valid_platforms, **prepared_data
+        )
+    else:
+        # prepared_data=prepare_data_for_paused_campaign(customer_name, campaign_name,current_date)
+        # html_template=render_template_string(
+        #     paused_campaign_mail_html_template, **prepared_data
+        # )
+        response=send_paused_status(data=data)
+        return response
+
     response = email_service.send_email_from_user(
         from_email=from_mail,
         to_email=to_mail,
@@ -186,7 +207,60 @@ def get_campaign_report():
             ),
             500,
         )
-    
+            
+
+
+@app.route("/send_paused_status", methods=["POST"])
+def send_paused_status(data=None):
+    if data is None:
+        data = request.get_json()
+    customer_name = data.get("customer_name")
+    campaign_name = data.get("campaign_name")
+    to_mail = data.get("to_mail")
+    from_mail = data.get("from_mail")
+    # platforms = data.get("platforms")
+    utc_now = datetime.datetime.now(timezone.utc)      # Format like "21-Aug-2025 09:00 AM UTC"
+    current_date = utc_now.strftime("%d-%b-%Y %I:%M %p UTC")
+    data=prepare_data_for_paused_campaign(customer_name, campaign_name,current_date)
+    html_template=render_template_string(
+        paused_campaign_mail_html_template, **data
+    )
+    response = email_service.send_email_from_user(
+        from_email=from_mail,
+        to_email=to_mail,
+        subject=f"digiAd Campaign Update | {campaign_name} - {current_date}",
+        html_content=html_template,
+    )
+
+    # Check response
+    if response.status_code == 202:
+        logger.info(f"Email sent successfully to {to_mail}, status_code: {response.status_code}")
+        return (
+            jsonify(
+                {
+                    "status": "success",
+                    "message": "Email sent successfully",
+                    "from": from_mail,
+                    "to": to_mail,
+                    "timestamp": datetime.datetime.now().isoformat(),
+                }
+            ),
+            200,
+        )
+    else:
+        logger.error(f"Failed to send email to {to_mail}, status_code: {response.status_code}, details: {response.text}")
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "Failed to send email",
+                    "details": response.text,
+                    "status_code": response.status_code,
+                }
+            ),
+            500,
+        )
+
 
 ########################### Main API Endpoints ############################
 @app.route("/get_daily_audience_campaign_report", methods=["POST"])

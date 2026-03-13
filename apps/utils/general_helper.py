@@ -33,15 +33,73 @@ def remove_files_if_exists(file_path):
         if os.path.exists(file_path):
             os.remove(file_path)
 
-####### Data preparation for email ##########
-def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_data):
+def is_platform_active(platform_credentials):
+    """
+    Helper method: Check if a single platform has an active status.
+    
+    Args:
+        platform_credentials (dict): Dictionary containing platform credentials and status
+        
+    Returns:
+        bool: True if platform status is 'active', False otherwise
+    """
+    if not platform_credentials:
+        return False
+    
+    status = platform_credentials.get("status", "").lower().strip()
+    return status == "enabled"
 
+
+def check_any_platform_active(all_platforms_credentials):
+    """
+    Helper method: Check if any platform has an active status.
+    
+    Args:
+        google_credentials (dict): Google platform credentials
+        facebook_credentials (dict): Facebook platform credentials
+        snapchat_credentials (dict): Snapchat platform credentials
+        twitter_credentials (dict): Twitter platform credentials
+        tiktok_credentials (dict): TikTok platform credentials
+        youtube_credentials (dict): YouTube platform credentials
+        instagram_credentials (dict): Instagram platform credentials
+        
+    Returns:
+        bool: True if any platform status is 'active', False if all are paused/inactive
+    """
+
+    for platform_credentials in all_platforms_credentials:
+        if is_platform_active(platform_credentials):
+            return True    
+    return False
+
+
+def prepare_data_for_paused_campaign(customer_name, campaign_name, current_date):
+    data = {
+        "name": customer_name,
+        "logo_url": "https://digiad.ai/_next/image?url=%2Fimages%2FDIGIADai.png&w=256&q=75",
+        "campaign_name": campaign_name,
+        "support_link": "https://digiad.ai/contact",
+        "campaign_resume_url": "https://digiad.ai/campaigns",
+        "pause_datetime":current_date
+    }
+    return data
+
+####### Data preparation for email ##########
+def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_data, platforms_config):
+    """
+    Prepare data for email template including platform status
+    
+    platforms_config: The configuration dict containing status info for each platform
+    """
+    
+    # Extract metrics and status for each platform
     google_imp = platforms_data["google"]["google_impr"]
     google_click = platforms_data["google"]["google_clicks"]
     google_ctr = platforms_data["google"]["google_ctr"]
     google_conversions = platforms_data["google"]["google_conversions"]
     google_cpc = platforms_data["google"]["google_cpc"]
     google_cost = platforms_data["google"]["google_cost"]
+    google_status = platforms_config.get("google", {}).get("status", "unknown").lower()
 
     facebook_imp = platforms_data["facebook"]["impressions"]
     facebook_click = platforms_data["facebook"]["clicks"]
@@ -49,6 +107,7 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
     facebook_conversions = platforms_data["facebook"]["conversions"]
     facebook_cpc = platforms_data["facebook"]["cost_per_click"]
     facebook_cost = platforms_data["facebook"]["cost"]
+    facebook_status = platforms_config.get("facebook", {}).get("status", "unknown").lower()
 
     snapchat_imp = platforms_data["snapchat"]["snapchat_impr"]
     snapchat_click = platforms_data["snapchat"]["snapchat_clicks"]
@@ -56,6 +115,7 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
     snapchat_conversions = platforms_data["snapchat"]["snapchat_conversions"]
     snapchat_cpc = platforms_data["snapchat"]["snapchat_cpc"]
     snapchat_cost = platforms_data["snapchat"]["snapchat_cost"]
+    snapchat_status = platforms_config.get("snapchat", {}).get("status", "unknown").lower()
 
     twitter_imp = platforms_data["twitter"]["twitter_impr"]
     twitter_click = platforms_data["twitter"]["twitter_clicks"]
@@ -63,6 +123,7 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
     twitter_conversions = platforms_data["twitter"]["twitter_conversions"]
     twitter_cpc = platforms_data["twitter"]["twitter_cpc"]
     twitter_cost = platforms_data["twitter"]["twitter_cost"]
+    twitter_status = platforms_config.get("twitter", {}).get("status", "unknown").lower()
 
     tiktok_imp = platforms_data["tiktok"]["tiktok_impr"]
     tiktok_click = platforms_data["tiktok"]["tiktok_clicks"]
@@ -70,6 +131,7 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
     tiktok_conversions = platforms_data["tiktok"]["tiktok_conversions"]
     tiktok_cpc = platforms_data["tiktok"]["tiktok_cpc"]
     tiktok_cost = platforms_data["tiktok"]["tiktok_cost"]
+    tiktok_status = platforms_config.get("tiktok", {}).get("status", "unknown").lower()
 
     youtube_imp = platforms_data["youtube"]["youtube_impr"]
     youtube_click = platforms_data["youtube"]["youtube_clicks"]
@@ -77,6 +139,7 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
     youtube_conversions = platforms_data["youtube"]["youtube_conversions"]
     youtube_cpc = platforms_data["youtube"]["youtube_cpc"]
     youtube_cost = platforms_data["youtube"]["youtube_cost"]
+    youtube_status = platforms_config.get("youtube", {}).get("status", "unknown").lower()
 
     instagram_imp = platforms_data["instagram"]["impressions"]
     instagram_click = platforms_data["instagram"]["clicks"]
@@ -84,65 +147,38 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
     instagram_conversions = platforms_data["instagram"]["conversions"]
     instagram_cpc = platforms_data["instagram"]["cost_per_click"]
     instagram_cost = platforms_data["instagram"]["cost"]
+    instagram_status = platforms_config.get("instagram", {}).get("status", "unknown").lower()
 
+    # Calculate aggregates
     agg_impr = (
-        google_imp
-        + facebook_imp
-        + snapchat_imp
-        + twitter_imp
-        + tiktok_imp
-        + youtube_imp
-        + instagram_imp
+        google_imp + facebook_imp + snapchat_imp + twitter_imp + 
+        tiktok_imp + youtube_imp + instagram_imp
     )
 
     agg_clicks = (
-        google_click
-        + facebook_click
-        + snapchat_click
-        + twitter_click
-        + tiktok_click
-        + youtube_click
-        + instagram_click
+        google_click + facebook_click + snapchat_click + twitter_click + 
+        tiktok_click + youtube_click + instagram_click
     )
 
     agg_ctr = (
-        google_ctr
-        + facebook_ctr
-        + snapchat_ctr
-        + twitter_ctr
-        + tiktok_ctr
-        + youtube_ctr
-        + instagram_ctr
+        google_ctr + facebook_ctr + snapchat_ctr + twitter_ctr + 
+        tiktok_ctr + youtube_ctr + instagram_ctr
     )
 
     agg_leads = (
-        google_conversions
-        + facebook_conversions
-        + snapchat_conversions
-        + twitter_conversions
-        + tiktok_conversions
-        + youtube_conversions
-        + instagram_conversions
+        google_conversions + facebook_conversions + snapchat_conversions + 
+        twitter_conversions + tiktok_conversions + youtube_conversions + 
+        instagram_conversions
     )
 
     agg_cpc = (
-        google_cpc
-        + facebook_cpc
-        + snapchat_cpc
-        + twitter_cpc
-        + tiktok_cpc
-        + youtube_cpc
-        + instagram_cpc
+        google_cpc + facebook_cpc + snapchat_cpc + twitter_cpc + 
+        tiktok_cpc + youtube_cpc + instagram_cpc
     )
 
     agg_cost = (
-        google_cost
-        + facebook_cost
-        + snapchat_cost
-        + twitter_cost
-        + tiktok_cost
-        + youtube_cost
-        + instagram_cost
+        google_cost + facebook_cost + snapchat_cost + twitter_cost + 
+        tiktok_cost + youtube_cost + instagram_cost
     )
 
     data = {
@@ -150,13 +186,15 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
         "logo_url": "https://digiad.ai/_next/image?url=%2Fimages%2FDIGIADai.png&w=256&q=75",
         "campaign_name": campaign_name,
         "report_datetime": current_date,
+        
         # Aggregate KPIs
         "agg_impressions": agg_impr,
         "agg_clicks": agg_clicks,
         "agg_ctr": round(agg_ctr, 2),
         "agg_leads": agg_leads,
         "agg_cpc": round(agg_cpc, 2),
-        "agg_cost": round(agg_cost),
+        "agg_cost": round(agg_cost,2),
+        
         # Facebook
         "fb_impr": facebook_imp,
         "fb_clicks": facebook_click,
@@ -164,6 +202,8 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
         "fb_leads": facebook_conversions,
         "fb_cpc": round(facebook_cpc, 2),
         "fb_cost": round(facebook_cost, 2),
+        "fb_status": facebook_status,
+        
         # Google
         "google_impr": google_imp,
         "google_clicks": google_click,
@@ -171,6 +211,8 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
         "google_leads": google_conversions,
         "google_cpc": round(google_cpc, 2),
         "google_cost": round(google_cost),
+        "google_status": google_status,
+        
         # Snapchat
         "snapchat_impr": snapchat_imp,
         "snapchat_clicks": snapchat_click,
@@ -178,6 +220,8 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
         "snapchat_leads": snapchat_conversions,
         "snapchat_cpc": round(snapchat_cpc, 2),
         "snapchat_cost": round(snapchat_cost),
+        "snapchat_status": snapchat_status,
+        
         # Twitter
         "twitter_impr": twitter_imp,
         "twitter_clicks": twitter_click,
@@ -185,6 +229,8 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
         "twitter_leads": twitter_conversions,
         "twitter_cpc": round(twitter_cpc, 2),
         "twitter_cost": round(twitter_cost),
+        "twitter_status": twitter_status,
+        
         # Tiktok
         "tiktok_impr": tiktok_imp,
         "tiktok_clicks": tiktok_click,
@@ -192,6 +238,8 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
         "tiktok_leads": tiktok_conversions,
         "tiktok_cpc": round(tiktok_cpc, 2),
         "tiktok_cost": round(tiktok_cost),
+        "tiktok_status": tiktok_status,
+        
         # Youtube
         "youtube_impr": youtube_imp,
         "youtube_clicks": youtube_click,
@@ -199,6 +247,8 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
         "youtube_leads": youtube_conversions,
         "youtube_cpc": round(youtube_cpc, 2),
         "youtube_cost": round(youtube_cost),
+        "youtube_status": youtube_status,
+        
         # Instagram
         "instagram_impr": instagram_imp,
         "instagram_clicks": instagram_click,
@@ -206,12 +256,14 @@ def prepare_data_for_mail(customer_name, campaign_name, current_date, platforms_
         "instagram_leads": instagram_conversions,
         "instagram_cpc": round(instagram_cpc, 2),
         "instagram_cost": round(instagram_cost),
+        "instagram_status": instagram_status,
+        
         # Links
         "deep_link_report": "https://your-digiad-platform.com/report/123",
         "support_link": "https://digiad.ai/contact",
-        "campaign_url": "https://digiad.ai/",
+        "campaign_url": "https://digiad.ai/campaigns",
     }
-    # print(data)
+    
     return data
 
 

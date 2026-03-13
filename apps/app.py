@@ -37,82 +37,93 @@ def health():
 @app.route("/send-email", methods=["POST"])
 @log_errors_and_respond(status_code=500)
 def send_email():
+    try :
+        # Get request data
+        data = request.get_json()
 
-    # Get request data
-    data = request.get_json()
+        # Basic required fields
+        required_fields = ["from", "to", "subject"]
+        for field in required_fields:
+            if field not in data:
+                return (
+                    jsonify(
+                        {"status": "error", "message": f"Missing required field: {field}"}
+                    ),
+                    400,
+                )
 
-    # Basic required fields
-    required_fields = ["from", "to", "subject"]
-    for field in required_fields:
-        if field not in data:
+        # Map 'from' parameter to actual email addresses
+        from_type = data["from"].lower()
+        if from_type == "sales":
+            from_email = config.SALES_EMAIL
+        elif from_type == "support":
+            from_email = config.SUPPORT_EMAIL
+        else:
+            from_email = data["from"]  # direct email
+
+        to_email = data["to"]
+        subject = data["subject"]
+
+        # Handle email content: template OR html
+        if "template" in data:
+            html = render_hbs_template(data["template"], data.get("context", {}))
+        elif "html" in data:
+            html = data["html"]
+        else:
             return (
                 jsonify(
-                    {"status": "error", "message": f"Missing required field: {field}"}
+                    {
+                        "status": "error",
+                        "message": 'Either "template" or "html" must be provided.',
+                    }
                 ),
                 400,
             )
 
-    # Map 'from' parameter to actual email addresses
-    from_type = data["from"].lower()
-    if from_type == "sales":
-        from_email = config.SALES_EMAIL
-    elif from_type == "support":
-        from_email = config.SUPPORT_EMAIL
-    else:
-        from_email = data["from"]  # direct email
+        # Send email
+        response = email_service.send_email_from_user(
+            from_email=from_email, to_email=to_email, subject=subject, html_content=html,
+        attachments=data.get("attachments")
+        )
 
-    to_email = data["to"]
-    subject = data["subject"]
-
-    # Handle email content: template OR html
-    if "template" in data:
-        html = render_hbs_template(data["template"], data.get("context", {}))
-    elif "html" in data:
-        html = data["html"]
-    else:
+        # Handle response
+        if response.status_code == 202:
+            return (
+                jsonify(
+                    {
+                        "status": "success",
+                        "message": "Email sent successfully",
+                        "from": from_email,
+                        "to": to_email,
+                        "timestamp": datetime.datetime.now().isoformat(),
+                    }
+                ),
+                200,
+            )
+        else:
+            return (
+                jsonify(
+                    {
+                        "status": "error",
+                        "message": "Failed to send email",
+                        "details": response.text,
+                        "status_code": response.status_code,
+                    }
+                ),
+                500,
+            )
+    except Exception as e:
+        logger.error(f"Error in send-email endpoint: {str(e)}")
         return (
             jsonify(
                 {
                     "status": "error",
-                    "message": 'Either "template" or "html" must be provided.',
-                }
-            ),
-            400,
-        )
-
-    # Send email
-    response = email_service.send_email_from_user(
-        from_email=from_email, to_email=to_email, subject=subject, html_content=html,
-    attachments=data.get("attachments")
-    )
-
-    # Handle response
-    if response.status_code == 202:
-        return (
-            jsonify(
-                {
-                    "status": "success",
-                    "message": "Email sent successfully",
-                    "from": from_email,
-                    "to": to_email,
-                    "timestamp": datetime.datetime.now().isoformat(),
-                }
-            ),
-            200,
-        )
-    else:
-        return (
-            jsonify(
-                {
-                    "status": "error",
-                    "message": "Failed to send email",
-                    "details": response.text,
-                    "status_code": response.status_code,
+                    "message": "An unexpected error occurred while sending email.",
+                    "details": str(e),
                 }
             ),
             500,
         )
-
 
 ########################### Main API Endpoints ############################
 @app.route("/get_hourly_campaign_report", methods=["POST"])

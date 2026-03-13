@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Subscription Expires in {{expiryTimeframe}}</title>
+</head>
+
+<body
+    style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; color: #000000; margin: 0; padding: 0; min-height: 100vh;">
+    <div class="email-container"
+        style="max-width: 600px; margin: 40px auto; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);">
+
+        <div class="header"
+            style="background-color: #f59e0b; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; text-align: center; padding: 30px 20px;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #ffffff;">⏰ {{expiryTimeframe}} Until Your
+                Plan Expires
+            </h1>
+        </div>
+
+        <div class="content" style="padding: 30px 20px; color: #333333;">
+            <p style="margin: 16px 0; font-size: 16px; line-height: 1.6; color: #555555;">Hi <strong
+                    style="color: #f59e0b; font-weight: 600;">{{FirstName}}</strong>,</p>
+            <p style="margin: 16px 0; font-size: 16px; line-height: 1.6; color: #555555;">Your DigiAd plan will expire
+                in the next {{expiryTimeframe}}.</p>
+            <p style="margin: 16px 0; font-size: 16px; line-height: 1.6; color: #555555;">To continue creating ads and
+                running campaigns without interruption, please renew your plan.</p>
+
+            <div class="expiry-notice"
+                style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #dc2626; font-weight: 600;">⚠️ Important:</p>
+                <p style="margin: 5px 0 0 0; color: #dc2626; font-size: 14px;">If you want to activate a new plan, you
+                    will first need to cancel your current plan. Once the current plan is canceled, you can immediately
+                    choose and activate a new plan.</p>
+            </div>
+
+            <div class="benefits-list"
+                style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #333333;">🔒 What happens if your plan expires?</h3>
+
+                <div class="benefit-item"
+                    style="display: flex; align-items: center; margin: 12px 0; padding: 12px; background-color: #ffffff; border-radius: 6px;">
+                    <div class="benefit-icon" style="font-size: 24px; margin-right: 15px;">♾️</div>
+                    <div style="flex: 1;">
+                        <strong style="color: #333333;">Credits & Campaigns</strong><br>
+                        <span style="font-size: 14px; color: #666666;">You won’t be able to create new ads or
+                            campaigns</span>
+                    </div>
+                </div>
+
+                <div class="benefit-item"
+                    style="display: flex; align-items: center; margin: 12px 0; padding: 12px; background-color: #ffffff; border-radius: 6px;">
+                    <div class="benefit-icon" style="font-size: 24px; margin-right: 15px;">🤖</div>
+                    <div style="flex: 1;">
+                        <strong style="color: #333333;">AI Ad & Video Generation</strong><br>
+                        <span style="font-size: 14px; color: #666666;">Access to AI tools will be paused</span>
+                    </div>
+                </div>
+
+                <div class="benefit-item"
+                    style="display: flex; align-items: center; margin: 12px 0; padding: 12px; background-color: #ffffff; border-radius: 6px;">
+                    <div class="benefit-icon" style="font-size: 24px; margin-right: 15px;">📊</div>
+                    <div style="flex: 1;">
+                        <strong style="color: #333333;">Analytics Reports</strong><br>
+                        <span style="font-size: 14px; color: #666666;">Campaign insights and reports will be
+                            unavailable</span>
+                    </div>
+                </div>
+
+                <div class="benefit-item"
+                    style="display: flex; align-items: center; margin: 12px 0; padding: 12px; background-color: #ffffff; border-radius: 6px;">
+                    <div class="benefit-icon" style="font-size: 24px; margin-right: 15px;">⚡</div>
+                    <div style="flex: 1;">
+                        <strong style="color: #333333;">Priority Support</strong><br>
+                        <span style="font-size: 14px; color: #666666;">Paid plan support will no longer be active</span>
+                    </div>
+                </div>
+            </div>
+
+            <p style="text-align: center; font-size: 16px; color: #333333; margin-top: 25px;">
+                <strong>To keep using DigiAd without interruption, renew your plan today.</strong>
+            </p>
+
+            <div style="text-align: center; margin: 25px 0;">
+                <a href="{{renewLink}}" class="cta-button"
+                    style="display: inline-block; padding: 14px 32px; font-size: 16px; color: #ffffff !important; background-color: #f59e0b; background: linear-gradient(135deg, #f59e0b, #d97706); text-decoration: none; border-radius: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">Manage
+                    My Plan</a>
+            </div>
+
+            <p style="font-size: 15px; color: #555555; margin-top: 25px; text-align: center;">
+                If you need help renewing or upgrading your plan, feel free to contact us at <a
+                    href="mailto:support@digiad.ai"
+                    style="color: #f59e0b; text-decoration: none;">support@digiad.ai</a>.
+            </p>
+        </div>
+
+        <div class="footer"
+            style="background-color: #f8f9fa; color: #666666; text-align: center; padding: 25px 20px; font-size: 13px; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 5px 0;">Best,<br>Team DigiAd</p>
+            <p style="margin: 5px 0;">© 2026 DigiAd AI. All rights reserved.</p>
+
+            {{#if unsubscribeLink}}
+            <p class="unsubscribe" style="margin-top: 15px; font-size: 12px; color: #999999;">
+                <a href="{{unsubscribeLink}}" style="color: #999999; text-decoration: underline;">Unsubscribe from these
+                    emails</a>
+            </p>
+            {{/if}}
+        </div>
+    </div>
+</body>
+
+</html>

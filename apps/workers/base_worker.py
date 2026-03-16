@@ -1,22 +1,24 @@
+import os
+import time
+import threading
+import requests
+from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+from dotenv import load_dotenv
+
+from database.db import get_db_connection
+
+
 """
 workers/base_worker.py
 
 Shared utilities for all email automation workers.
 Provides:
-  - get_db_connection()  — with connect_timeout so it never hangs forever
+  - get_db_connection()  — now backed by a global connection pool
   - run_cycle_with_timeout() — runs a single worker cycle in a thread with a max
     wall-clock limit, killing it if it exceeds CYCLE_TIMEOUT_SECONDS
   - run_with_pool() — replaces ThreadPoolExecutor.map(), adds per-future timeout
 """
-
-import os
-import time
-import threading
-import psycopg2
-import requests
-from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -27,29 +29,10 @@ CYCLE_TIMEOUT_SECONDS = int(os.getenv("WORKER_CYCLE_TIMEOUT_SECONDS", 120))
 # Max seconds to wait for a SINGLE USER to be processed inside the thread pool.
 PER_USER_TIMEOUT_SECONDS = int(os.getenv("WORKER_PER_USER_TIMEOUT_SECONDS", 30))
 
-# Postgres connection timeout in seconds
-DB_CONNECT_TIMEOUT = int(os.getenv("DB_CONNECT_TIMEOUT", 5))
-
-
-def get_db_config():
-    """Returns DB connection config with connect_timeout set."""
-    return {
-        "host":            os.getenv("DB_HOST", "localhost"),
-        "port":            os.getenv("DB_PORT", "5432"),
-        "dbname":          os.getenv("DB_NAME", "digiAd"),
-        "user":            os.getenv("DB_USER", "postgres"),
-        "password":        os.getenv("DB_PASSWORD", "12345"),
-        "connect_timeout": DB_CONNECT_TIMEOUT,  # << never hang on DB connect
-    }
-
-
-def get_db_connection():
-    """Open a psycopg2 connection with a connect timeout."""
-    return psycopg2.connect(**get_db_config())
-
 
 # Allow default workers to be configured by env, default to 1 to avoid MailboxConcurrency errors
 WORKER_CONCURRENCY = int(os.getenv("WORKER_CONCURRENCY", 1))
+
 
 def run_with_pool(candidates, process_fn, max_workers=WORKER_CONCURRENCY):
     """

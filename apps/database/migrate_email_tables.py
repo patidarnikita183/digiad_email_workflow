@@ -1,6 +1,7 @@
 import psycopg2
-import os
 from dotenv import load_dotenv
+
+from database.db import get_db_config
 
 # ---------------------------------------------------------------------
 # CONFIGURATION
@@ -8,13 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "port": os.getenv("DB_PORT", "5432"),
-    "dbname": os.getenv("DB_NAME", "digiAd"),
-    "user": os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "12345"),
-}
+DB_CONFIG = get_db_config()
 
 USERS_TABLE = os.getenv("USERS_TABLE", "users_demo")
 SUBSCRIPTIONS_TABLE = os.getenv("USER_SUBSCRIPTIONS_TABLE", "user_subscriptions1_demo")

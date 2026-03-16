@@ -1,88 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
 
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URGENT: Subscription Expiring in {{expiryTimeframe}}</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscription Expiring in {{expiryTimeframe}}</title>
 </head>
 
-<body
-    style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; color: #000000; margin: 0; padding: 0; min-height: 100vh;">
-    <div class="email-container"
-        style="max-width: 600px; margin: 40px auto; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);">
+<body style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,Helvetica,sans-serif;">
 
-        <div class="header"
-            style="background-color: #dc2626; background: linear-gradient(135deg, #dc2626, #991b1b); color: #ffffff; text-align: center; padding: 30px 20px;">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #ffffff;">🚨 {{expiryTimeframe}} Until
-                Expiration</h1>
-        </div>
+<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f4f6f9">
+<tr>
+<td align="center">
 
-        <div class="content" style="padding: 30px 20px; color: #333333;">
-            <p style="margin: 16px 0; font-size: 16px; line-height: 1.6; color: #555555;">Hi <strong
-                    style="color: #dc2626; font-weight: 600;">{{FirstName}}</strong>,</p>
-            <p style="margin: 16px 0; font-size: 16px; line-height: 1.6; color: #555555;">⚠️ <strong>Final
-                    reminder:</strong> Your DigiAd plan will expire in {{expiryTimeframe}}.</p>
-            <p style="margin: 16px 0; font-size: 16px; line-height: 1.6; color: #555555;">To continue running campaigns
-                and using DigiAd without interruption, please renew your plan now.</p>
+<table width="600" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="border:1px solid #e5e7eb;">
 
-            <div class="expiry-notice"
-                style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                <p style="margin: 0; color: #dc2626; font-weight: 600;">Important:</p>
-                <p style="margin: 5px 0 0 0; color: #dc2626; font-size: 14px;">To activate a new plan, you must first
-                    cancel your current plan, then you can immediately select and activate a new one.</p>
-            </div>
+<!-- HEADER -->
+<tr>
+{{!-- <td align="center" style="padding:28px;background:#6B8CFF;color:#d1d5db;"> --}}
+<td align="center" style="padding:28px;background:#d81919c0;color:#000;">
 
-            <div class="impact-list"
-                style="background-color: #fef2f2; border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #dc2626;">
-                <h3 style="margin: 0 0 15px 0; color: #dc2626;">If the plan expires, the following will be paused:</h3>
+<h1 style="margin:0;font-size:22px;">⚠️ Subscription Expiring Soon</h1>
+<p style="margin-top:8px;font-size:14px;color:#000;">
+ ⏰ {{expiryTimeframe}} remaining 
+</p>
+</td>
+</tr>
 
-                <div class="impact-item" style="margin: 10px 0; padding: 10px; font-size: 15px; color: #555555;">
-                    ❌ <strong>Creating new ads, videos, or campaigns</strong>
-                </div>
-                <div class="impact-item" style="margin: 10px 0; padding: 10px; font-size: 15px; color: #555555;">
-                    ❌ <strong>Access to remaining credits</strong>
-                </div>
-                <div class="impact-item" style="margin: 10px 0; padding: 10px; font-size: 15px; color: #555555;">
-                    ❌ <strong>AI-powered ad and video generation</strong>
-                </div>
-                <div class="impact-item" style="margin: 10px 0; padding: 10px; font-size: 15px; color: #555555;">
-                    ❌ <strong>Campaign analytics and reports</strong>
-                </div>
-                <div class="impact-item" style="margin: 10px 0; padding: 10px; font-size: 15px; color: #555555;">
-                    ❌ <strong>Priority support</strong>
-                </div>
-            </div>
+<!-- CONTENT -->
+<tr>
+<td style="padding:28px;color:#333;font-size:16px;line-height:1.6;">
 
-            <p style="text-align: center; font-size: 16px; color: #333333; margin-top: 30px;">
-                <strong>Renew your plan now to keep your campaigns running.</strong>
-            </p>
+<p style="margin-top:0;">
+Hi <strong>{{FirstName}}</strong>,
+</p>
 
-            <div style="text-align: center; margin: 25px 0;">
-                <a href="{{renewLink}}" class="cta-button"
-                    style="display: inline-block; padding: 16px 40px; font-size: 18px; color: #ffffff !important; background-color: #dc2626; background: linear-gradient(135deg, #dc2626, #991b1b); text-decoration: none; border-radius: 6px; font-weight: 700; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); transistion: all .3s ease;">Manage
-                    {{expiryTimeframe}}</a>
-            </div>
+<p>
+Your digiAd AI subscription will expire in <strong>{{expiryTimeframe}}</strong>.
+To avoid disruption to your campaigns, please renew your plan.
+</p>
 
-            <p style="font-size: 15px; color: #555555; margin-top: 25px; text-align: center;">
-                Need help? Contact us at <a href="mailto:support@digiad.ai"
-                    style="color: #dc2626; text-decoration: none; font-weight: 600;">support@digiad.ai</a>
-            </p>
-        </div>
+</td>
+</tr>
 
-        <div class="footer"
-            style="background-color: #f8f9fa; color: #666666; text-align: center; padding: 25px 20px; font-size: 13px; border-top: 1px solid #e0e0e0;">
-            <p style="margin: 5px 0;">Best,<br>Team DigiAd</p>
-            <p style="margin: 5px 0;">© 2026 DigiAd AI. All rights reserved.</p>
+<!-- ALERT BOX -->
+<tr>
+<td style="padding:0 28px 20px 28px;">
 
-            {{#if unsubscribeLink}}
-            <p class="unsubscribe" style="margin-top: 15px; font-size: 12px; color: #999999;">
-                <a href="{{unsubscribeLink}}" style="color: #999999; text-decoration: underline;">Unsubscribe from these
-                    emails</a>
-            </p>
-            {{/if}}
-        </div>
-    </div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff1f2;border-left:4px solid #ef4444;">
+<tr>
+<td style="padding:16px;color:#7f1d1d;font-size:14px;">
+<strong>Important</strong><br>
+To activate a new plan, you must cancel your current plan first.
+Once cancelled, you can immediately activate a new plan.
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<!-- IMPACT TITLE -->
+<tr>
+<td style="padding:0 28px 10px 28px;font-size:18px;font-weight:bold;color:#111827;">
+What will be paused if your plan expires
+</td>
+</tr>
+
+<!-- IMPACT LIST -->
+<tr>
+<td style="padding:0 28px 20px 28px;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border:1px solid #e5e7eb;">
+
+<tr>
+<td style="padding:12px;font-size:14px;">❌ Creating new ads, videos, or campaigns</td>
+</tr>
+
+<tr>
+<td style="padding:12px;border-top:1px solid #e5e7eb;font-size:14px;">❌ Access to remaining credits</td>
+</tr>
+
+<tr>
+<td style="padding:12px;border-top:1px solid #e5e7eb;font-size:14px;">❌ AI-powered ad and video generation</td>
+</tr>
+
+<tr>
+<td style="padding:12px;border-top:1px solid #e5e7eb;font-size:14px;">❌ Campaign analytics and reports</td>
+</tr>
+
+<tr>
+<td style="padding:12px;border-top:1px solid #e5e7eb;font-size:14px;">❌ Priority support</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+
+<!-- CTA -->
+<tr>
+<td align="center" style="padding:20px 28px 30px 28px;">
+
+<a href="{{renewLink}}"
+style="background:#2563eb;color:#ffffff;text-decoration:none;padding:14px 32px;font-size:16px;font-weight:bold;border-radius:4px;display:inline-block;">
+Manage My Plan
+</a>
+
+</td>
+</tr>
+
+<!-- SUPPORT -->
+<tr>
+<td align="center" style="padding:0 28px 28px 28px;font-size:14px;color:#555;">
+Need help renewing your plan?<br>
+Contact us at
+<a href="mailto:support@digiad.ai" style="color:#2563eb;text-decoration:none;">
+support@digiad.ai
+</a>
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td align="center" bgcolor="#f9fafb" style="padding:20px;font-size:12px;color:#777;border-top:1px solid #e5e7eb;">
+
+<p style="margin:5px 0;">Best regards,<br><strong>Team digiAd AI</strong></p>
+
+<p style="margin:5px 0;">© 2026 digiAd AI. All rights reserved.</p>
+
+<!--
+{{#if unsubscribeLink}}
+<p style="margin-top:10px;">
+<a href="{{unsubscribeLink}}" style="color:#999;text-decoration:underline;">
+Unsubscribe from these emails
+</a>
+</p>
+{{/if}}
+-->
+
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
 </body>
-
 </html>
+

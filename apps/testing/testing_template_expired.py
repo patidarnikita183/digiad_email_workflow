@@ -9,8 +9,8 @@ TEMPLATE_CREDITS_EXPIRING_SOON = os.getenv("TEMPLATE_CREDITS_EXPIRING_SOON", "EX
 TEMPLATE_1DAY_BEFORE_EXPIRY    = os.getenv("TEMPLATE_1DAY_BEFORE_EXPIRY", "EXPIRY_REMINDER_1H.hbs")
 TEMPLATE_CREDITS_EXPIRED       = os.getenv("TEMPLATE_CREDITS_EXPIRED", "EXPIRED_NOTIFICATION.hbs")
 
-email_type = "pre_expiry_mail_1"    
-subject = "Your DigiAd credits are expiring soon!"
+email_type = "expired_notification_mail"    
+subject = "Your DigiAd credits are expired!"
 
 def send_test_template_email(email, name, hours_to_expiry_str):
     context = {
@@ -25,7 +25,7 @@ def send_test_template_email(email, name, hours_to_expiry_str):
         "to": email,
         "from": SUPPORT_MAIL,
         "subject": subject,
-        "template": TEMPLATE_CREDITS_EXPIRING_SOON,
+        "template": TEMPLATE_CREDITS_EXPIRED,
         "email_type": email_type,
         "email_id": email,
         "context": context,
@@ -40,7 +40,9 @@ def send_test_template_email(email, name, hours_to_expiry_str):
         print("Request failed:", e)
         
 if __name__ == "__main__":
-    test_email = "patidarnikita183@gmail.com"
-    test_name = "Nikita"
-    hours_to_expiry = "48 hours"
+    # test_email = "patidarnikita183@gmail.com"
+    test_email = "nikita.patidar@xaltanalytics.com"
+    
+    test_name = "Nikita Patidar"
+    hours_to_expiry = "0 hours"
     send_test_template_email(test_email, test_name, hours_to_expiry)

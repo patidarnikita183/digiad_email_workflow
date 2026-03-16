@@ -50,6 +50,23 @@ TEMPLATE_CREDITS_EXPIRED       = os.getenv("TEMPLATE_CREDITS_EXPIRED", "EXPIRED_
 SUPPORT_MAIL = os.getenv("SUPPORT_MAIL", "support@digiad.ai")
 API_URL = os.getenv("SEND_EMAIL_API_URL", "http://localhost:5000/send_email")
 
+import math
+
+def format_expiry_time(total_seconds: float) -> str:
+    total_seconds = int(total_seconds)
+
+    minutes = total_seconds // 60
+    hours = minutes // 60
+    days = hours // 24
+
+    if days >= 1:
+        remaining_hours = hours % 24
+        return f"{days} day{'s' if days > 1 else ''} {remaining_hours} hour{'s' if remaining_hours != 1 else ''}"
+
+    if hours >= 1:
+        return f"{hours} hour{'s' if hours > 1 else ''}"
+
+    return f"{minutes} minute{'s' if minutes > 1 else ''}"
 
 def send_email(user, template, email_type, subject, extra_context=None):
     email = user["email"]
@@ -58,10 +75,7 @@ def send_email(user, template, email_type, subject, extra_context=None):
     expiry_date = end_date.strftime("%Y-%m-%d %H:%M") if end_date else "N/A"
     # in hours
     hours_to_expiry = (end_date - datetime.now()).total_seconds() / 3600 if end_date else None
-    if hours_to_expiry < 1:
-        hours_to_expiry_str = f"{hours_to_expiry*60:.0f} minutes" if hours_to_expiry is not None else "N/A"
-    else:
-        hours_to_expiry_str = f"{hours_to_expiry:.1f} hours" if hours_to_expiry is not None else "N/A"
+    hours_to_expiry_str = format_expiry_time((end_date - datetime.now()).total_seconds()) if hours_to_expiry is not None else "N/A"
     context = {
         "FirstName": name,
         # 'expiryTimeframe': f"{expiry_date}",
@@ -228,13 +242,13 @@ def process_expiry_flow():
                     ON u.user_id = es.user_id
                 JOIN {USER_SUBSCRIPTIONS_TABLE} s
                     ON s.user_id = es.user_id
-                   AND s.status = 'active'
+                AND s.status = 'active'
                 WHERE es.is_unsubscribed = FALSE
-                  AND u.deleted_at IS NULL
-                  AND s.end_date IS NOT NULL
-                  AND es.expiry_sequence_step < 3
-                  AND (s.razorsubscription_id IS NOT NULL OR s.user_subscription_id IS NOT NULL)
-            """
+                AND u.deleted_at IS NULL
+                AND s.end_date IS NOT NULL
+                AND es.expiry_sequence_step < 3
+                AND (s."razorSubscription_id" IS NOT NULL OR s.user_subscription_id IS NOT NULL)
+                """
             cur.execute(query)
             candidates = cur.fetchall()
 

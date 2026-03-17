@@ -243,11 +243,14 @@ def process_expiry_flow():
                 JOIN {USER_SUBSCRIPTIONS_TABLE} s
                     ON s.user_id = es.user_id
                 AND s.status = 'active'
+                AND s.deleted_at IS NULL
+                AND u.deleted_at IS NULL
+                AND es.auto_status is False
                 WHERE es.is_unsubscribed = FALSE
                 AND u.deleted_at IS NULL
                 AND s.end_date IS NOT NULL
                 AND es.expiry_sequence_step < 3
-                AND (s."razorSubscription_id" IS NOT NULL OR s.user_subscription_id IS NOT NULL)
+                
                 """
             cur.execute(query)
             candidates = cur.fetchall()

@@ -1,19 +1,15 @@
 import time
 import os
-import psycopg2
 from datetime import datetime
+
+# Use common pooled DB connection
+from database.db import get_db_connection
+from error_handling.logging_utils import get_logger
 
 # Dynamic interval (minutes)
 CRON_INTERVAL = int(os.getenv("CRON_INTERVAL_MINUTES", 20))
 
-DB_CONFIG = {
-    "host": "localhost",
-    "database": "your_db",
-    "user": "your_user",
-    "password": "your_password",
-    "port": 5432
-}
-
+logger = get_logger("cron_to_fetch_data")
 
 def run_queries(conn):
 
@@ -116,37 +112,50 @@ def run_queries(conn):
         );
         """,
 
-    
 
     
     ]
 
     cursor = conn.cursor()
 
-    for q in queries:
-        cursor.execute(q)
+    try:
+        for idx, q in enumerate(queries, start=1):
+            try:
+                cursor.execute(q)
+            except Exception:
+                logger.exception("Query #%s failed. Aborting this cron cycle.", idx)
+                raise
 
-    conn.commit()
-    cursor.close()
-
-    print(f"[{datetime.utcnow()}] Email status cron executed")
+        conn.commit()
+        logger.info("Email status cron executed successfully.")
+    finally:
+        try:
+            cursor.close()
+        except Exception:
+            logger.exception("Failed closing DB cursor.")
 
 
 def main():
 
     while True:
-
+        start_ts = time.time()
+        logger.info("Cron cycle started. interval_minutes=%s", CRON_INTERVAL)
+        conn = None
         try:
-            conn = psycopg2.connect(**DB_CONFIG)
-
+            conn = get_db_connection()
             run_queries(conn)
-
-            conn.close()
-
         except Exception as e:
-            print("Cron error:", e)
+            logger.exception("Cron cycle failed.")
+        finally:
+            try:
+                if conn is not None:
+                    conn.close()
+            except Exception:
+                logger.exception("Failed closing DB connection.")
 
-        print(f"Sleeping for {CRON_INTERVAL} minutes...\n")
+        elapsed = time.time() - start_ts
+        logger.info("Cron cycle finished. elapsed_seconds=%.3f", elapsed)
+        logger.info("Sleeping for %s minutes.", CRON_INTERVAL)
 
         time.sleep(CRON_INTERVAL * 60)
 

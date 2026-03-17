@@ -139,7 +139,8 @@ def send_email():
                 except Exception as track_err:
                     print(f"Error tracking email: {track_err}")
 
-         
+            else:
+                print("No email_type determined, skipping tracking.")
             return (
                 jsonify(
                     {

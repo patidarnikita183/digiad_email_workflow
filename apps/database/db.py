@@ -43,6 +43,27 @@ class PooledConnection:
             self._pool.putconn(self._conn)
             self._returned = True
 
+    # Support usage as a context manager: `with get_db_connection() as conn:`
+    def __enter__(self):
+        # Return self so code can call conn.cursor(...),
+        # and __getattr__ will delegate to the underlying connection.
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # Emulate psycopg2 connection context manager semantics:
+        # commit on success, rollback on error, then return to pool.
+        try:
+            if exc_type is None:
+                try:
+                    self._conn.commit()
+                except Exception:
+                    self._conn.rollback()
+                    raise
+            else:
+                self._conn.rollback()
+        finally:
+            self.close()
+
     # Delegate everything else to the underlying connection
     def __getattr__(self, item):
         return getattr(self._conn, item)

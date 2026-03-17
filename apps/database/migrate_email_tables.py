@@ -1,6 +1,6 @@
 import psycopg2
 from dotenv import load_dotenv
-
+import os
 from database.db import get_db_config
 
 # ---------------------------------------------------------------------
@@ -109,7 +109,7 @@ def create_email_status_table(cursor):
         is_unsubscribed BOOLEAN NOT NULL DEFAULT FALSE,
         not_interested_reason email_not_interested_reason_enum NULL,
         end_date TIMESTAMP NULL,
-        auto_status BOOLEAN NOT NULL DEFAULT FALSE,
+        auto_status BOOLEAN NOT NULL DEFAULT TRUE,
         created_at TIMESTAMP NOT NULL DEFAULT now(),
         updated_at TIMESTAMP NOT NULL DEFAULT now()
     );
@@ -150,6 +150,8 @@ def create_email_history_table(cursor):
 EMAIL_STATUS_EXTRA_COLUMNS = {
     "deleted_at": "TIMESTAMP NULL",
     "login_type": "VARCHAR NULL",
+    "end_date": "TIMESTAMP NULL",
+    "auto_status": "BOOLEAN NOT NULL DEFAULT TRUE",
 }
 
 EMAIL_HISTORY_EXTRA_COLUMNS = {

@@ -17,7 +17,7 @@ from utils.tiktok_analytics import *
 from utils.twitter_analytics import *
 from collections import OrderedDict
 from pdf_generation.main import generate_multi_platform_campaign_report
-
+from helpers.helper import *
 app = Flask(__name__)
 app.secret_key = f"{uuid.uuid4()}"
 app.config['JSON_SORT_KEYS'] = False
@@ -38,6 +38,7 @@ def health():
 @log_errors_and_respond(status_code=500)
 def send_email():
     try :
+        print("Received request to /send-email endpoint")
         # Get request data
         data = request.get_json()
 
@@ -63,8 +64,30 @@ def send_email():
 
         to_email = data["to"]
         subject = data["subject"]
+        
+        template_name = data.get('template')
+        template_name = template_name.lower() if template_name else None
+        template_name =  os.path.splitext(os.path.basename(template_name or ""))[0].lower()
 
+        # Determine email_type
+        # Priority: 1. data['email_type'], 2. derived from template name
+        email_type = data.get("email_type",None)
+        print(f"email_type from request: {email_type}, template_name: {template_name}")
+        if not email_type and template_name:
+            print("Determining email_type based on template_name...")
+            if template_name == TEMPLATE_ACTIVATION:
+                email_type = 'activation'
+            elif template_name == TEMPLATE_WELCOME:
+                email_type = 'welcome'
+            # Add other mappings as needed
+            elif 'activation_reminder' in template_name.lower():
+                email_type = 'activation_reminder'
+            elif 'activation' in template_name.lower():
+                email_type = 'activation'
+            elif 'welcome' in template_name.lower():
+                email_type = 'welcome'
         # Handle email content: template OR html
+        print(f"Determined email_type: {email_type}, template_name: {template_name}")
         if "template" in data:
             html = render_hbs_template(data["template"], data.get("context", {}))
         elif "html" in data:
@@ -85,9 +108,38 @@ def send_email():
             from_email=from_email, to_email=to_email, subject=subject, html_content=html,
         attachments=data.get("attachments")
         )
-
+        print(f"Email service response: status_code={response.status_code}, text={response.text}")
         # Handle response
         if response.status_code == 202:
+            if email_type:
+                try:
+                    print("Tracking email event for user...")
+                    conn = get_db_connection()
+                    user = get_user_by_email(conn, to_email)
+                    print(f"User fetched from DB: {user}")
+                    conn.close()
+
+                    if user and user.get("user_id"):
+                        print("User found, tracking email event...")
+                        track_email_event(
+                            user_id=user["user_id"],
+                            email_type=email_type,
+                            template_name=template_name,
+                            metadata={"subject": subject, "template": template_name},
+                            email_id=to_email
+                        )
+                        # Append to worker test log for validation
+                        append_worker_log({
+                            "sent_at":      datetime.datetime.utcnow().isoformat(),
+                            "email":        to_email,
+                            "user_id":      str(user["user_id"]),
+                            "email_type":   email_type,
+                            "template":     template_name,
+                        })
+                except Exception as track_err:
+                    print(f"Error tracking email: {track_err}")
+
+         
             return (
                 jsonify(
                     {

@@ -116,3 +116,55 @@ AND (
         es.user_subscription_id IS NULL
         OR es.user_subscription_id <> s.user_subscription_id
     );
+
+
+# insert into subscription table  for razor pay
+-- INSERT INTO public.user_subscriptions (
+--     user_id,
+--     plan_id,
+--     start_date,
+--     end_date,
+--     "razorSubscription_id",
+--     created_at,
+--     updated_at
+-- )
+-- VALUES (
+--     '7adaab65-be76-495d-ad65-8abb6afd4761',
+--     '5dfe3780-1174-4e87-91a4-32d422013fff',
+--     NOW(),
+--     NOW() + INTERVAL '1 hour',
+--     'trial-free-plan',
+--     NOW(),
+--     NOW()
+-- );
+
+# insert into subscription table for paypal
+INSERT INTO public.user_subscriptions (
+    user_id,
+    paypal_plan_id,
+    start_date,
+    end_date,
+    "paypalSubscription_id",
+    created_at,
+    updated_at
+)
+VALUES (
+    '01a03b3b-a431-43bc-9903-944136a30cab',
+    '0d483888-a52a-4902-832d-0bb3214181ad',
+    NOW(),
+    NOW() + INTERVAL '1 hour',
+    'paypal-free-plan',
+    NOW(),
+    NOW()
+);
+
+
+# check how many active plan of any user right now 
+SELECT 
+    user_id,
+    COUNT(*) AS active_plan_count
+FROM user_subscriptions
+WHERE status = 'active'
+AND deleted_at IS NULL
+GROUP BY user_id
+HAVING COUNT(*) > 1;

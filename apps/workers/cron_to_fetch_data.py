@@ -88,6 +88,17 @@ def run_queries(conn):
         # """
         # case 3 - 
         # set auto status false if user is having free subscription or canceled subscription
+        # """UPDATE email_status es
+        # SET 
+        #     auto_status = false,
+        #     updated_at = NOW()
+        # FROM user_subscriptions s
+        # WHERE es.user_subscription_id = s.user_subscription_id
+        # AND (
+        #         (s."razorSubscription_id" = 'trial-free-plan' OR s."paypalSubscription_id" = 'paypal-free-plan')
+        #         OR s.user_cancel_at IS NOT NULL
+        #     );"""
+        
         """UPDATE email_status es
         SET 
             auto_status = false,
@@ -96,7 +107,6 @@ def run_queries(conn):
         WHERE es.user_subscription_id = s.user_subscription_id
         AND (
                 (s."razorSubscription_id" = 'trial-free-plan' OR s."paypalSubscription_id" = 'paypal-free-plan')
-                OR s.user_cancel_at IS NOT NULL
             );"""
         
         # Update credit id

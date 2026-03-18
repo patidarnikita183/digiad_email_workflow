@@ -17,6 +17,9 @@ FEATURE_CREDITS_TABLE = os.getenv("USER_FEATURE_CREDITS_TABLE", "user_feature_cr
 
 EMAIL_STATUS_TABLE = os.getenv("EMAIL_STATUS_TABLE", "email_status")
 EMAIL_HISTORY_TABLE = os.getenv("EMAIL_HISTORY_TABLE", "email_history")
+GLOBAL_EMAIL_API_HISTORY_TABLE = os.getenv(
+    "GLOBAL_EMAIL_API_HISTORY_TABLE", "global_email_api_history"
+)
 
 
 # ---------------------------------------------------------------------
@@ -142,6 +145,34 @@ def create_email_history_table(cursor):
     """
     )
 
+def create_global_email_api_history_table(cursor):
+    print(f"Ensuring {GLOBAL_EMAIL_API_HISTORY_TABLE} exists...")
+
+    cursor.execute(
+        f"""
+    CREATE TABLE IF NOT EXISTS {GLOBAL_EMAIL_API_HISTORY_TABLE} (
+        global_history_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+        user_id UUID NULL,
+        from_email VARCHAR NULL,
+        to_email VARCHAR NOT NULL,
+        subject VARCHAR NULL,
+        template_name VARCHAR NULL,
+        email_type VARCHAR NULL,
+
+        status VARCHAR NOT NULL, -- sent | failed | error
+        provider_status_code INTEGER NULL,
+        provider_response_text TEXT NULL,
+        error_message TEXT NULL,
+
+        request_payload JSONB NULL,
+        metadata JSONB NULL,
+
+        created_at TIMESTAMP NOT NULL DEFAULT now()
+    );
+    """
+    )
+
 
 # ---------------------------------------------------------------------
 # COLUMN SAFETY CHECKS
@@ -197,6 +228,7 @@ def migrate():
         # 3️⃣ Create tables
         create_email_status_table(cursor)
         create_email_history_table(cursor)
+        create_global_email_api_history_table(cursor)
 
         # 4️⃣ Ensure additional columns
         ensure_columns(cursor, EMAIL_STATUS_TABLE, EMAIL_STATUS_EXTRA_COLUMNS)

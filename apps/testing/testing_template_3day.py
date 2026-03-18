@@ -44,5 +44,5 @@ if __name__ == "__main__":
     # test_email = "nikita.patidar@xaltanalytics.com"
     
     test_name = "Nikita"
-    hours_to_expiry = "48 hours"
+    hours_to_expiry = "2 Days 3 hours"
     send_test_template_email(test_email, test_name, hours_to_expiry)

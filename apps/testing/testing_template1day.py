@@ -40,9 +40,9 @@ def send_test_template_email(email, name, hours_to_expiry_str):
         print("Request failed:", e)
         
 if __name__ == "__main__":
-    # test_email = "patidarnikita183@gmail.com"
-    test_email = "nikita.patidar@xaltanalytics.com"
+    test_email = "patidarnikita183@gmail.com"
+    # test_email = "nikita.patidar@xaltanalytics.com"
     
     test_name = "Nikita Patidar"
-    hours_to_expiry = "1 hours"
+    hours_to_expiry = "1 Day"
     send_test_template_email(test_email, test_name, hours_to_expiry)

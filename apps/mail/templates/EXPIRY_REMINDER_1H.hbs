@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Subscription Expiring in {{expiryTimeframe}}</title>
+<title>Free Plan Expiring in {{expiryTimeframe}}</title>
 </head>
 
 <body style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,Helvetica,sans-serif;">
@@ -20,9 +20,9 @@
 {{!-- <td align="center" style="padding:28px;background:#6B8CFF;color:#d1d5db;"> --}}
 <td align="center" style="padding:28px;background:#d81919c0;color:#000;">
 
-<h1 style="margin:0;font-size:22px;">⚠️ Subscription Expiring Soon</h1>
+<h1 style="margin:0;font-size:22px;">⚠️ Your Free Plan is About to Expire</h1>
 <p style="margin-top:8px;font-size:14px;color:#000;">
- ⏰ {{expiryTimeframe}} remaining 
+ ⏰ Only {{expiryTimeframe}} left
 </p>
 </td>
 </tr>
@@ -36,8 +36,8 @@ Hi <strong>{{FirstName}}</strong>,
 </p>
 
 <p>
-Your digiAd AI subscription will expire in <strong>{{expiryTimeframe}}</strong>.
-To avoid disruption to your campaigns, please renew your plan.
+Your digiAd AI free plan will expire in <strong>{{expiryTimeframe}}</strong>.
+To continue using our services without interruption, please upgrade to a paid plan.
 </p>
 
 </td>
@@ -51,8 +51,8 @@ To avoid disruption to your campaigns, please renew your plan.
 <tr>
 <td style="padding:16px;color:#7f1d1d;font-size:14px;">
 <strong>Important</strong><br>
-To activate a new plan, you must cancel your current plan first.
-Once cancelled, you can immediately activate a new plan.
+To switch to a paid plan, you’ll need to cancel your current free plan first.
+Once cancelled, you can immediately activate a new subscription.
 </td>
 </tr>
 </table>
@@ -63,8 +63,7 @@ Once cancelled, you can immediately activate a new plan.
 <!-- IMPACT TITLE -->
 <tr>
 <td style="padding:0 28px 10px 28px;font-size:18px;font-weight:bold;color:#111827;">
-What will be paused if your plan expires
-</td>
+What will stop working after your free plan expires</td>
 </tr>
 
 <!-- IMPACT LIST -->
@@ -73,9 +72,9 @@ What will be paused if your plan expires
 
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border:1px solid #e5e7eb;">
 
-<tr>
-<td style="padding:12px;font-size:14px;">❌ Creating new ads, videos, or campaigns</td>
-</tr>
+{{!-- <tr>
+<td style="padding:12px;font-size:14px;">❌ Creating new ads, videos, or creatives</td>
+</tr> --}}
 
 <tr>
 <td style="padding:12px;border-top:1px solid #e5e7eb;font-size:14px;">❌ Access to remaining credits</td>
@@ -104,7 +103,7 @@ What will be paused if your plan expires
 
 <a href="{{renewLink}}"
 style="background:#2563eb;color:#ffffff;text-decoration:none;padding:14px 32px;font-size:16px;font-weight:bold;border-radius:4px;display:inline-block;">
-Manage My Plan
+Upgrade My Plan
 </a>
 
 </td>
@@ -113,7 +112,7 @@ Manage My Plan
 <!-- SUPPORT -->
 <tr>
 <td align="center" style="padding:0 28px 28px 28px;font-size:14px;color:#555;">
-Need help renewing your plan?<br>
+Need help upgrading your plan?<br>
 Contact us at
 <a href="mailto:support@digiad.ai" style="color:#2563eb;text-decoration:none;">
 support@digiad.ai

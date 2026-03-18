@@ -51,6 +51,9 @@ USER_SUBSCRIPTIONS_TABLE = os.getenv("USER_SUBSCRIPTIONS_TABLE", "user_subscript
 USER_FEATURE_CREDITS_TABLE = os.getenv("USER_FEATURE_CREDITS_TABLE", "user_feature_credits_demo")
 EMAIL_STATUS_TABLE = os.getenv("EMAIL_STATUS_TABLE", "email_status_demo")
 EMAIL_HISTORY_TABLE = os.getenv("EMAIL_HISTORY_TABLE", "email_history_demo")
+GLOBAL_EMAIL_API_HISTORY_TABLE = os.getenv(
+    "GLOBAL_EMAIL_API_HISTORY_TABLE", "global_email_api_history"
+)
 
 
 
@@ -212,3 +215,72 @@ def track_email_event(user_id, email_type, template_name=None, metadata=None, em
         # We do NOT raise here to avoid blocking the email sending response
     finally:
         conn.close()
+
+
+def save_global_email_api_history(
+    *,
+    to_email: str,
+    status: str,
+    from_email: str | None = None,
+    subject: str | None = None,
+    template_name: str | None = None,
+    email_type: str | None = None,
+    provider_status_code: int | None = None,
+    provider_response_text: str | None = None,
+    error_message: str | None = None,
+    user_id: str | None = None,
+    request_payload: dict | None = None,
+    metadata: dict | None = None,
+):
+    """
+    Global history row for every /send-email API request.
+    Best-effort: never raises to the caller.
+    Returns global_history_id (uuid string) or None.
+    """
+    conn = get_db_connection()
+    try:
+        with conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(
+                    f"""
+                    INSERT INTO {GLOBAL_EMAIL_API_HISTORY_TABLE} (
+                        user_id,
+                        from_email,
+                        to_email,
+                        subject,
+                        template_name,
+                        email_type,
+                        status,
+                        provider_status_code,
+                        provider_response_text,
+                        error_message,
+                        request_payload,
+                        metadata
+                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    RETURNING global_history_id
+                    """,
+                    (
+                        user_id,
+                        from_email,
+                        to_email,
+                        subject,
+                        template_name,
+                        email_type,
+                        status,
+                        provider_status_code,
+                        provider_response_text,
+                        error_message,
+                        json.dumps(request_payload) if request_payload else None,
+                        json.dumps(metadata) if metadata else None,
+                    ),
+                )
+                row = cursor.fetchone()
+                return str(row["global_history_id"]) if row and row.get("global_history_id") else None
+    except Exception as e:
+        print(f"Failed to save global email history: {e}")
+        return None
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass

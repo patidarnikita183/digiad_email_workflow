@@ -3,6 +3,7 @@ from datetime import timezone
 import copy
 import requests
 from flask import Flask, jsonify, render_template_string, request
+import os
 
 from mail.config import Config
 from mail.email_service import DomainEmailService
@@ -111,6 +112,7 @@ def send_email():
         print(f"Email service response: status_code={response.status_code}, text={response.text}")
         # Handle response
         if response.status_code == 202:
+            user = None
             if email_type:
                 try:
                     print("Tracking email event for user...")
@@ -141,6 +143,24 @@ def send_email():
 
             else:
                 print("No email_type determined, skipping tracking.")
+
+            # Global API history (best-effort)
+            try:
+                history_id = save_global_email_api_history(
+                    to_email=to_email,
+                    from_email=from_email,
+                    subject=subject,
+                    template_name=template_name,
+                    email_type=email_type,
+                    status="sent",
+                    provider_status_code=response.status_code,
+                    provider_response_text=response.text,
+                    request_payload=data,
+                    metadata={"attachments": bool(data.get("attachments"))},
+                    user_id=str(user["user_id"]) if (user and user.get("user_id")) else None,
+                )
+            except Exception:
+                history_id = None
             return (
                 jsonify(
                     {
@@ -148,12 +168,29 @@ def send_email():
                         "message": "Email sent successfully",
                         "from": from_email,
                         "to": to_email,
+                        "history_id": history_id,
                         "timestamp": datetime.datetime.now().isoformat(),
                     }
                 ),
                 200,
             )
         else:
+            # Global API history for failed sends (best-effort)
+            try:
+                history_id = save_global_email_api_history(
+                    to_email=to_email,
+                    from_email=from_email,
+                    subject=subject,
+                    template_name=template_name,
+                    email_type=email_type,
+                    status="failed",
+                    provider_status_code=response.status_code,
+                    provider_response_text=response.text,
+                    request_payload=data,
+                    metadata={"attachments": bool(data.get("attachments"))},
+                )
+            except Exception:
+                history_id = None
             return (
                 jsonify(
                     {
@@ -161,18 +198,44 @@ def send_email():
                         "message": "Failed to send email",
                         "details": response.text,
                         "status_code": response.status_code,
+                        "history_id": history_id,
                     }
                 ),
                 500,
             )
     except Exception as e:
         logger.error(f"Error in send-email endpoint: {str(e)}")
+        # Global API history for unexpected errors (best-effort)
+        try:
+            _data = locals().get("data") if isinstance(locals().get("data"), dict) else None
+            _to = locals().get("to_email")
+            _from = locals().get("from_email")
+            _subject = locals().get("subject")
+            _template = locals().get("template_name")
+            _etype = locals().get("email_type")
+            history_id = (
+                save_global_email_api_history(
+                    to_email=_to or "unknown",
+                    from_email=_from,
+                    subject=_subject,
+                    template_name=_template,
+                    email_type=_etype,
+                    status="error",
+                    error_message=str(e),
+                    request_payload=_data,
+                )
+                if _to
+                else None
+            )
+        except Exception:
+            history_id = None
         return (
             jsonify(
                 {
                     "status": "error",
                     "message": "An unexpected error occurred while sending email.",
                     "details": str(e),
+                    "history_id": history_id,
                 }
             ),
             500,
